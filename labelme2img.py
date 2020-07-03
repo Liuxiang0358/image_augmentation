@@ -6,7 +6,7 @@ import numpy as np
 import os
 import cv2
 from labelme import utils
-def read_mask(file_name):
+def read_mask(file_name,save_fold):
     json_file= file_name
     
     data = json.load(open(json_file))
@@ -42,12 +42,14 @@ def read_mask(file_name):
     # plt.subplot(224)
     plt.imshow(mask2*img)
     plt.axis('off')
-    plt.savefig(os.path.join('img',file_name.replace('json','jpg')),bbox_inches='tight',pad_inches=0.0)
+    plt.savefig(os.path.join(save_fold,file_name.replace('json','jpg')),bbox_inches='tight',pad_inches=0.0)
 
     # cv2.imwrite(os.path.join('img',file_name.replace('json','jpg')),mask2*img)
     # plt.show()
 if __name__ == '__main__':
+    input_fold = 'input'
+    save_fold = 'save/'
     file = os.listdir('./') 
     for f in file:
         if 'json' in f :
-            read_mask(f)
+            read_mask(f,save_fold)

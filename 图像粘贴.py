@@ -14,6 +14,10 @@ import xml.etree.ElementTree as ET
 classes = ['Gas_tank','motor','Pram','Pet','Express_package','water','carry','bag','luggage','head','body']
 
 def Contrast_and_Brightness1(img ,alpha):
+    '''
+    改变图像亮度
+    alpha 为改变系数 
+    '''
     beta = 1
     blank = np.zeros(img.shape, img.dtype)
     # dst = alpha * img + beta * blank
@@ -30,9 +34,16 @@ def Contrast_and_Brightness(img ):
 
 
 def Gaussian(img):
+    '''
+    5*5 高斯滤波
+    '''
     return cv2.GaussianBlur(img, (5, 5), 0)
 
 def isgary(img):
+    '''
+    判断是否为灰度图像
+    inpput: img
+    '''
        img = np.transpose(img,(2,0,1))
        mean1 = np.mean(img[0,:,:])
        mean2 = np.mean(img[1,:,:])
@@ -43,6 +54,10 @@ def isgary(img):
               return False
 
 def rotate(image):  # 1
+    '''
+    对图像进行旋转，旋转角度为[-20,20]
+    input：img
+    '''
     (h, w) = image.shape[:2]  # 2
     angle = np.random.random() * np.random.choice([-10, 10]) * 2
     center = (w // 2, h // 2)  # 4
@@ -53,12 +68,27 @@ def rotate(image):  # 1
     return rotated
 
 def rad(x):
+  '''
+  将角度换算成弧度
+  input: x (角度)
+  output ： 弧度
+  '''
   return x * np.pi / 180
 
-def gray2bgr(img):
+    def gray2bgr(img):
+   '''
+   将单通道的灰度图像转换成三通道的图像
+   input： gray img
+   output ： color img
+   '''
       return cv2.cvtColor(img,cv2.COLOR_GRAY2RGB)
 
 def convert(size, box):
+    '''
+    label 转换
+    input :x1,y1,x2,y2 (顶点)
+    output：x,y,w,h   (中心点)
+    '''
     dw = 1. / size[0]
     dh = 1. / size[1]
     x = (box[0] + box[1]) / 2.0
@@ -72,7 +102,11 @@ def convert(size, box):
     return (x, y, w, h)
 # 扩展图像，保证内容不超出可视范围
 def rotate_3d(img):
-
+    '''
+    对图像进行透视变换
+    input： img
+    output： img
+    '''
          w, h = img.shape[0:2]
        
          anglex = np.random.randint(-45,45)
@@ -135,15 +169,28 @@ def rotate_3d(img):
          return result
 
 def flip(img,flipcode):
+    '''
+    对图像进行镜像变换
+    input：img  
+           flipcode  [-1,0,1]
+    output:img
+    
+    '''
     return cv2.flip(img,flipcode)
 
 
 def reshape(img):
+    '''
+    对图像的长宽比进行改变
+    '''
     return cv2.resize(img, dsize=None, fx=(1 - np.random.random() / 10), fy=(1 - np.random.random() / 10),
                       interpolation=cv2.INTER_LINEAR)
 
 def convert_annotation(image_id):
-    
+    '''
+    将xml的标签转换成txt  （x1，y1,w,h） 顶点坐标
+    imput ： xml文件索引
+    '''
     # in_file = open('mixdata/Annotations/' + image_id)  # 读取xml文件路径
     in_file = open(image_id)  # 读取xml文件路径
     label_list = []
@@ -178,6 +225,15 @@ def convert_annotation(image_id):
     return label_list
 
 def synthesis(img1_name, img2_name_list, path_result_save,log_save):
+    '''
+    对图像进行合成 
+    input: 
+        img1_name : 需要合成的背景照片 ，<name>.jpg
+        img2_name_list :  type ：list     [<name1>.jpg,<name2>.jpg]
+        path_result_save : 输出图像保存路径
+        log_save ： 输出标签保存路径
+    output: None
+    '''
     thresh = 5
     img1 = cv2.imread(img1_name)
     h, w = img1.shape[:-1]
@@ -232,20 +288,21 @@ def synthesis(img1_name, img2_name_list, path_result_save,log_save):
         # mean1 = np.mean(gray1).astype(np.uint8)
         # length = len(np.nonzero(gray2)[0])
         # mean2 = np.uint8(np.sum(gray2) / length)
-        wrap = np.random.choice([0,1,2,3])
-        h2,w2 = img2.shape[:-1]
-        if wrap == 0:
-            w_rand = random.randint(0,np.int(0.1*w2))
-            img2 = img2[w_rand:w2,:]
-        elif wrap == 1:
-            w_rand = random.randint(0,np.int(0.1*w2))
-            img2 = img2[0:w2-w_rand,:] 
-        elif wrap == 2:
-            h_rand = random.randint(0,np.int(0.1*h2))
-            img2 = img2[:,h_rand:h2] 
-        else:
-            h_rand = random.randint(0,np.int(0.1*h2))
-            img2 = img2[:,:h2 - h_rand] 
+        
+        # wrap = np.random.choice([0,1,2,3])
+        # h2,w2 = img2.shape[:-1]
+        # if wrap == 0:
+        #     w_rand = random.randint(0,np.int(0.1*w2))
+        #     img2 = img2[w_rand:w2,:]
+        # elif wrap == 1:
+        #     w_rand = random.randint(0,np.int(0.1*w2))
+        #     img2 = img2[0:w2-w_rand,:] 
+        # elif wrap == 2:
+        #     h_rand = random.randint(0,np.int(0.1*h2))
+        #     img2 = img2[:,h_rand:h2] 
+        # else:
+        #     h_rand = random.randint(0,np.int(0.1*h2))
+        #     img2 = img2[:,:h2 - h_rand] 
 
         rows, cols, channels = img2.shape
         # if 'new' in img2_name:
@@ -310,12 +367,12 @@ def synthesis(img1_name, img2_name_list, path_result_save,log_save):
 
 
 if __name__ == '__main__':
-    path_Elevator = 'nobody_deal'
-    # path_Elevator = 'result1'
-    path_gas = 'img'
+    path_Elevator = 'nobody_deal'       ##  电梯图片路径
+    # path_Elevator = 'result1'     
+    path_gas = 'img'                   ## 需要合成的图片路径
     # path_Elevator = 'mixdata/JPEGImages'
-    path_result_save = 'test'
-    log_save = 'log_test.txt'
+    path_result_save = 'test'     ##  保存合成图片的路径
+    log_save = 'log_test.txt'     ##  
     file_gas = os.listdir(path_gas)
     file_floor = os.listdir(path_Elevator)
     file_floor = [file   for file in file_floor if '.xml' not in  file]
